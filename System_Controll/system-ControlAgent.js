@@ -151,7 +151,10 @@ Rules:
 // ------------------ AGENT ------------------
 const agent = createReactAgent({
   llm: model,
-  tools: [shutdownTool, restartTool, openAppTool, moveMouseTool, mouseClickTool, typeTextTool, writeFileTool, sleepTool, runCommandTool, makeDirectoryTool],
+  tools: [shutdownTool, restartTool, openAppTool,
+    moveMouseTool, mouseClickTool, typeTextTool,
+    writeFileTool, sleepTool, runCommandTool,
+    makeDirectoryTool],
   prompt,
 });
 
@@ -163,7 +166,8 @@ const agent = createReactAgent({
         role: "user",
         content: `In this current working directory create a project folder name as TODO. 
                   Inside that todo folder create a todo app using html css and js.
-                  After creating all the files, open that html file using full pathname in browser like open_app { appName: "start D:\\Codes\\Agentic-Projects\\TODO\\index.html" }.`
+                  After creating all the files, open that html file using full pathname in browser 
+                  like open_app { appName: "start D:\\Codes\\Agentic-Projects\\TODO\\index.html" }.`
       }]
     },
     { configurable: { userName: "Computer agent" } }
