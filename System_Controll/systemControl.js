@@ -48,18 +48,28 @@ export async function openApp(appName) {
 
 // Move mouse to (x, y)
 export async function moveMouse(x, y) {
+  await sleep(2000);
   await mouse.setPosition(new Point(x, y));
   return `Mouse moved to (${x}, ${y})`;
 }
 
 // Click mouse button
 export async function mouseClick(button = "left") {
+  await sleep(2000);
   const btn =
     button === "right" ? Button.RIGHT :
     button === "middle" ? Button.MIDDLE :
     Button.LEFT;
   await mouse.click(btn);
   return `Mouse clicked with ${button} button`;
+}
+
+
+export async function clickImage(imagePath) {
+  const region = await screen.find(imagePath); // locate button on screen
+  await mouse.setPosition(new Point(region.left + region.width/2, region.top + region.height/2));
+  await mouse.click(Button.LEFT);
+  return `Clicked on ${imagePath}`;
 }
 
 
@@ -72,9 +82,19 @@ export async function typeText(text) {
 }
 
 // Write to a file
-export function writeFile(path, content) {
+export async function writeFile(path, content) {
+  await sleep(2000);
   fs.writeFileSync(path, content, "utf8");
   return `File written to ${path}`;
 }
 
-typeText("Hello, world!");
+export async function createFile(path) {
+  await sleep(2000);
+  fs.writeFileSync(path, "", "utf8");
+  return `File created at ${path}`;
+}
+
+export function makeDirectory(path) {
+  fs.mkdirSync(path, { recursive: true });
+  return `Directory created at ${path}`;
+}

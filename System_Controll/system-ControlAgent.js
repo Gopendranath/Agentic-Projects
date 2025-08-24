@@ -6,7 +6,10 @@ import {
   mouseClick,
   typeText,
   writeFile,
-  sleep
+  sleep,
+  clickImage,
+  runCommand,
+  makeDirectory
 } from "./systemControl.js";
 import { ChatMistralAI } from "@langchain/mistralai";
 import { tool } from "@langchain/core/tools";
@@ -77,9 +80,41 @@ const writeFileTool = tool(async ({ path, content }) => await writeFile(path, co
   }),
 });
 
+const runCommandTool = tool(async ({ command }) => await runCommand(command), {
+  name: "run_command",
+  description: "Runs a shell command.",
+  schema: z.object({
+    command: z.string().describe("The command to run."),
+  }),
+})
+
+const makeDirectoryTool = tool(async ({ path }) => await makeDirectory(path), {
+  name: "make_directory",
+  description: "Creates a directory.",
+  schema: z.object({
+    path: z.string().describe("The path to the directory."),
+  }),
+});
+
+
+const clickImageTool = tool(async ({ imagePath }) => {
+  try {
+    return await clickImage(imagePath);
+  } catch (err) {
+    return `Error: Could not find image ${imagePath}`;
+  }
+}, {
+  name: "click_image",
+  description: "Clicks an image on the screen.",
+  schema: z.object({
+    imagePath: z.string().describe("The path to the image file."),
+  }),
+});
+
+
 // ------------------ MODEL ------------------
 const model = new ChatMistralAI({
-  model: "mistral-medium-latest",
+  model: "mistral-small-latest",
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
@@ -101,6 +136,8 @@ Available operations:
 - type_text { text: string } → types the given text at the cursor location.
 - write_file { path: string, content: string } → writes content into a file at the given path.
 - sleep { duration: number } → sleeps for the given duration in milliseconds.
+- run_command { command: string } → runs a shell command.
+- make_directory { path: string } → creates a directory at the given path.
 
 Rules:
 1. Only use the tools for actual execution.
@@ -114,7 +151,7 @@ Rules:
 // ------------------ AGENT ------------------
 const agent = createReactAgent({
   llm: model,
-  tools: [shutdownTool, restartTool, openAppTool, moveMouseTool, mouseClickTool, typeTextTool, writeFileTool, sleepTool],
+  tools: [shutdownTool, restartTool, openAppTool, moveMouseTool, mouseClickTool, typeTextTool, writeFileTool, sleepTool, runCommandTool, makeDirectoryTool],
   prompt,
 });
 
@@ -122,7 +159,12 @@ const agent = createReactAgent({
 (async () => {
   const response = await agent.invoke(
     {
-      messages: [{ role: "user", content: "Open notepad and write a story about Nikola Tesla within 100 words" }],
+      messages: [{
+        role: "user",
+        content: `In this current working directory create a project folder name as TODO. 
+                  Inside that todo folder create a todo app using html css and js.
+                  After creating all the files, open that html file using full pathname in browser like open_app { appName: "start D:\\Codes\\Agentic-Projects\\TODO\\index.html" }.`
+      }]
     },
     { configurable: { userName: "Computer agent" } }
   );
