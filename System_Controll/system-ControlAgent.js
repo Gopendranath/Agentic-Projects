@@ -64,24 +64,8 @@ const agent = createReactAgent({
   prompt,
 });
 
-// ------------------ RUN ------------------
-// (async () => {
-//   const response = await agent.invoke(
-//     {
-//       messages: [{
-//         role: "user",
-//         content: `In this current working directory create a project folder name as TODO. 
-//                   Inside that todo folder create a todo app using html css and js.
-//                   After creating all the files, open that html file using full pathname in browser 
-//                   like open_app { appName: "start D:\\Codes\\Agentic-Projects\\TODO\\index.html" }.`
-//       }]
-//     },
-//     { configurable: { userName: "Computer agent" } }
-//   );
 
-//   console.log(response);
-// })();
-
+// ------------------ EXECUTION AND STREAMING ------------------
 for await (const response of await agent.stream(
   {
     messages: [{
