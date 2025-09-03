@@ -1,6 +1,6 @@
 # Agentic-Projects
 
-This repository contains a collection of agentic and retrieval-augmented generation (RAG) projects, tools, and system control modules. The codebase is organized into several directories, each serving a specific purpose.
+This repository contains a collection of agentic and retrieval-augmented generation (RAG) projects, tools, and system control modules. The codebase is organized into several directories, each serving a specific purpose. Created just for fun.
 
 ## Project Structure
 
