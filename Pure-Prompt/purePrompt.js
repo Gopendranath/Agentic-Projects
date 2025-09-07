@@ -130,5 +130,5 @@ Do not explain, do not add \`\`\`json fences.`
 // Example Run
 // -------------------
 runWithLoop(
-    "Create a folder test123 in this current directory, add a file hello.txt with all 26 letters, then open the file in notepad."
+    "Create a folder test123 in this current directory, add 3 file hello1.txt hello2.txt hello3.txt one by one and write all 26 letters into them and append different number for each file with the letters, open all 3 files in notepad."
 );
