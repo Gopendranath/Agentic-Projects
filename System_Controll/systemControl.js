@@ -1,5 +1,5 @@
-import { exec } from "child_process";
-import { mouse, keyboard, Button, Point } from "@nut-tree-fork/nut-js";
+import { exec, spawn } from "child_process";
+import { mouse, keyboard, Button, Point, screen } from "@nut-tree-fork/nut-js";
 import fs from "fs";
 
 // Run a shell command (cross-platform)
@@ -29,21 +29,23 @@ export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Open application (e.g., Chrome, VS Code)
+// ✅ Fixed: Open application (non-blocking)
 export async function openApp(appName) {
-  const cmd =
-    process.platform === "win32"
-      ? `start ${appName}`
-      : process.platform === "darwin"
-      ? `open -a "${appName}"`
-      : appName;
+  try {
+    const parts = appName.split(" ");
+    const command = parts[0];
+    const args = parts.slice(1);
 
-  const result = await runCommand(cmd);
+    const child = spawn(command, args, { detached: true, stdio: "ignore" });
+    child.unref(); // detach so Node isn’t tied to the child process
 
-  // Example: wait 1 second after opening app
-  await sleep(2000);
+    // Optional small delay to let it start
+    await sleep(2000);
 
-  return result || `Opened ${appName}`;
+    return `🚀 App '${appName}' launched.`;
+  } catch (err) {
+    return `❌ Error opening app: ${err.message}`;
+  }
 }
 
 // Move mouse to (x, y)
@@ -64,7 +66,6 @@ export async function mouseClick(button = "left") {
   return `Mouse clicked with ${button} button`;
 }
 
-
 export async function clickImage(imagePath) {
   const region = await screen.find(imagePath); // locate button on screen
   await mouse.setPosition(new Point(region.left + region.width/2, region.top + region.height/2));
@@ -72,8 +73,8 @@ export async function clickImage(imagePath) {
   return `Clicked on ${imagePath}`;
 }
 
-
 keyboard.config.autoDelayMs = 10;
+
 // Type text at cursor
 export async function typeText(text) {
   await sleep(2000);

@@ -1,5 +1,6 @@
 import fs from "fs";
 import { exec } from "child_process";
+import { spawn } from "child_process";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 dotenv.config();
@@ -30,9 +31,14 @@ function createFile(path, content) {
 
 function openApp(appName) {
     try {
-        exec(appName, (err) => {
-            if (err) console.error(err);
-        });
+        // Split appName into command + args
+        const parts = appName.split(" ");
+        const command = parts[0];
+        const args = parts.slice(1);
+
+        const child = spawn(command, args, { detached: true, stdio: "ignore" });
+        child.unref(); // fully detach from parent process
+
         return `🚀 App '${appName}' launched.`;
     } catch (err) {
         return `❌ Error opening app: ${err.message}`;
