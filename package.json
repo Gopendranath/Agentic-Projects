@@ -23,8 +23,11 @@
     "@tavily/core": "^0.5.11",
     "axios": "^1.11.0",
     "cheerio": "^1.1.2",
+    "chromadb": "^3.0.14",
     "langchain": "^0.3.31",
     "openai": "^4.91.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "zod": "^3.25.76",
     "zod-to-json-schema": "^3.24.6"
   }

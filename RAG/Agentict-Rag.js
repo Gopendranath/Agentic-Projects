@@ -62,7 +62,7 @@ const promptTemplate = await pull("rlm/rag-prompt");
 
 
 
-
+//=========================================================
 
 // Define state for application
 const InputStateAnnotation = Annotation.Root({
@@ -75,6 +75,9 @@ const StateAnnotation = Annotation.Root({
     answer: Annotation(),
 });
 
+
+
+//=========================================================
 // Define application steps
 const retrieve = async (state) => {
     const retrievedDocs = await vectorStore.similaritySearch(state.question);
