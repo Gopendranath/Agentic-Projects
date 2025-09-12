@@ -5,3 +5,10 @@ messages: [{
                   After creating all the files, open that html file using full pathname in browser 
                   like open_app { appName: "start D:\\Codes\\Agentic-Projects\\TODO\\index.html" }.`
 }]
+
+// Pure-Prompt/purePrompt.js
+runWithLoop(
+    `Create a folder test123 in this current directory, 
+    add 3 file hello1.txt hello2.txt hello3.txt one by one and write all 26 letters into them 
+    and append different number for each file with the letters, open all 3 files in notepad.`
+);

@@ -1,5 +1,4 @@
 import fs from "fs";
-import { exec } from "child_process";
 import { spawn } from "child_process";
 import OpenAI from "openai";
 import dotenv from "dotenv";
@@ -37,7 +36,7 @@ function openApp(appName) {
         const args = parts.slice(1);
 
         const child = spawn(command, args, { detached: true, stdio: "ignore" });
-        child.unref(); // fully detach from parent process
+        child.unref(); // fully detach
 
         return `🚀 App '${appName}' launched.`;
     } catch (err) {
@@ -85,21 +84,29 @@ Do not explain, do not add \`\`\`json fences.`
     let done = false;
 
     while (!done) {
-        // 1. Ask LLM for next function
+        // 1. Ask LLM for next function with streaming
         const response = await client.chat.completions.create({
             model: "mistral-small-latest",
             messages: context,
+            stream: true,
         });
 
-        let raw = response.choices[0].message.content.trim();
+        // 2. Collect streamed tokens
+        let raw = "";
+        for await (const chunk of response) {
+            const delta = chunk.choices[0]?.delta?.content || "";
+            process.stdout.write(delta); // live stream to console
+            raw += delta;
+        }
+
+        console.log("\n\n🔹 Cleaned LLM Output:", raw);
 
         // Strip markdown fences
         if (raw.startsWith("```")) {
             raw = raw.replace(/```json|```/g, "").trim();
         }
 
-        console.log("🔹 Cleaned LLM Output:", raw);
-
+        // 3. Parse safely
         let parsed;
         try {
             parsed = JSON.parse(raw);
@@ -116,15 +123,15 @@ Do not explain, do not add \`\`\`json fences.`
             break;
         }
 
-        // 2. Run function
+        // 4. Run function
         const result = fn(...Object.values(parsed.args));
         console.log(`⚡ Ran ${fnName}:`, result);
 
-        // 3. Feed result back into context
-        context.push({ role: "assistant", content: raw }); // LLM decision
-        context.push({ role: "user", content: `Result: ${result}` }); // Function output
+        // 5. Feed result back into context
+        context.push({ role: "assistant", content: raw });
+        context.push({ role: "user", content: `Result: ${result}` });
 
-        // 4. Decide next action
+        // 6. Decide next action
         if (parsed.status === "done") {
             console.log("✅ Workflow complete");
             done = true;
